@@ -8,7 +8,7 @@ export const Route = createFileRoute("/admin")({
   component: AdminDashboard,
 });
 
-const API_URL = "http://localhost:8000";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<"videos" | "shorts" | "posters">("videos");
