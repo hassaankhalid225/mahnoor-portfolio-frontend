@@ -79,9 +79,9 @@ function VideoManager({ type, endpoint }: { type: string; endpoint: string }) {
       ]);
       return { previous };
     },
-    onSuccess: (savedItem) => {
+    onSuccess: (savedItem: any) => {
       queryClient.setQueryData([endpoint], (old: any[]) =>
-        old.map((item) => (String(item.id).startsWith("temp-") ? savedItem : item))
+        old.map((item: any) => (String(item.id).startsWith("temp-") ? savedItem : item))
       );
       setTitle("");
       setYoutubeId("");
@@ -105,11 +105,11 @@ function VideoManager({ type, endpoint }: { type: string; endpoint: string }) {
     onMutate: async (id: string) => {
       await queryClient.cancelQueries({ queryKey: [endpoint] });
       const previous = queryClient.getQueryData([endpoint]);
-      queryClient.setQueryData([endpoint], (old: any[]) => old.filter((i) => i.id !== id));
+      queryClient.setQueryData([endpoint], (old: any[]) => old.filter((i: any) => i.id !== id));
       return { previous };
     },
     onSuccess: () => toast.success("Deleted successfully"),
-    onError: (err: any, _id, context: any) => {
+    onError: (err: any, _id: any, context: any) => {
       queryClient.setQueryData([endpoint], context?.previous);
       toast.error(`Delete failed: ${err.message}`);
     },
@@ -322,11 +322,11 @@ function PosterManager() {
     onMutate: async (id: string) => {
       await queryClient.cancelQueries({ queryKey: ["/posters"] });
       const previous = queryClient.getQueryData(["/posters"]);
-      queryClient.setQueryData(["/posters"], (old: any[]) => old.filter((p) => p.id !== id));
+      queryClient.setQueryData(["/posters"], (old: any[]) => old.filter((p: any) => p.id !== id));
       return { previous };
     },
     onSuccess: () => toast.success("Poster deleted!"),
-    onError: (err: any, _id, context: any) => {
+    onError: (err: any, _id: any, context: any) => {
       queryClient.setQueryData(["/posters"], context?.previous);
       toast.error(`Delete failed: ${err.message}`);
     },

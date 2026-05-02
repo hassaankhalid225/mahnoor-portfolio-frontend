@@ -228,7 +228,7 @@ function Hero() {
           {editorData.name} — {editorData.title}
         </p>
         <h1 className="font-display text-[14vw] leading-[0.9] tracking-tight text-cinema-text md:text-[8.5vw]">
-          {words.map((w, index) => (
+          {words.map((w: string, index: number) => (
             <span
               key={index}
               className="word-rise mr-3 inline-block"
@@ -290,7 +290,7 @@ function About() {
               Toolkit
             </p>
             <div className="flex flex-wrap gap-2">
-              {editorData.tools.map((t) => (
+              {editorData.tools.map((t: string) => (
                 <span
                   key={t}
                   className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm text-cinema-text/90 backdrop-blur-sm"
@@ -304,7 +304,7 @@ function About() {
       </div>
 
       <div className="reveal mx-auto mt-24 grid max-w-7xl grid-cols-2 gap-px overflow-hidden rounded-2xl border border-white/10 bg-white/5 md:grid-cols-4">
-        {editorData.stats.map((s) => (
+        {editorData.stats.map((s: any) => (
           <div key={s.label} className="bg-cinema-bg px-6 py-10 text-center">
             <div className="font-display text-5xl text-cinema-accent md:text-6xl">
               {s.value}
@@ -334,7 +334,7 @@ function Services() {
           </div>
         </div>
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {services.map((s, i) => (
+          {services.map((s: any, i: number) => (
             <div
               key={s.title}
               className="reveal group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] p-7 backdrop-blur-md transition hover:-translate-y-1 hover:border-cinema-accent/50"
@@ -589,7 +589,7 @@ function PostersSection() {
 
         {isLoading ? (
           <Carousel scrollerRef={ref}>
-            {[1, 2, 3].map((i) => (
+            {[1, 2, 3].map((i: number) => (
               <div
                 key={i}
                 className="group relative w-[80vw] flex-shrink-0 snap-start overflow-hidden rounded-2xl border border-white/10 bg-white/10 md:w-[400px] animate-pulse"
@@ -641,7 +641,7 @@ function Testimonials() {
           </h2>
         </div>
         <div className="grid gap-6 md:grid-cols-3">
-          {testimonials.map((t, index) => (
+          {testimonials.map((t: any, index: number) => (
             <figure
               key={index}
               className="reveal flex h-full flex-col rounded-2xl border border-white/10 bg-white/[0.03] p-8 backdrop-blur-md"
