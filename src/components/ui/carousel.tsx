@@ -87,7 +87,6 @@ const Carousel = React.forwardRef<
       return;
     }
 
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setApi(api);
   }, [api, setApi]);
 

@@ -680,10 +680,10 @@ function Contact() {
       />
       <div className="relative mx-auto max-w-5xl text-center">
         <p className="reveal mb-6 text-xs uppercase tracking-[0.3em] text-cinema-accent">
-          07 — Let's talk
+          07 — Let&apos;s talk
         </p>
         <h2 className="reveal font-display text-6xl leading-[0.95] text-cinema-text md:text-8xl">
-          Let's create something{" "}
+          Let&apos;s create something{" "}
           <span className="italic text-cinema-accent">cinematic.</span>
         </h2>
         <div className="reveal mt-12 flex flex-wrap items-center justify-center gap-4">
