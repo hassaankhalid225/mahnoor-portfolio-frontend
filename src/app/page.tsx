@@ -1,4 +1,5 @@
 'use client'
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -227,11 +228,11 @@ function Hero() {
           {editorData.name} — {editorData.title}
         </p>
         <h1 className="font-display text-[14vw] leading-[0.9] tracking-tight text-cinema-text md:text-[8.5vw]">
-          {words.map((w, i) => (
+          {words.map((w, index) => (
             <span
-              key={i}
+              key={index}
               className="word-rise mr-3 inline-block"
-              style={{ animationDelay: `${i * 0.08 + 0.1}s` }}
+              style={{ animationDelay: `${index * 0.08 + 0.1}s` }}
             >
               {w === "STORIES." ? (
                 <span className="italic text-cinema-accent">{w}</span>
@@ -398,7 +399,7 @@ function Carousel({
     };
   }, [scrollerRef]);
 
-  const scrollBy = (dx: number) => scrollerRef.current?.scrollBy({ left: dx, behavior: "smooth" });
+  const scrollByAmount = (dx: number) => scrollerRef.current?.scrollBy({ left: dx, behavior: "smooth" });
 
   return (
     <div className="relative">
@@ -411,14 +412,14 @@ function Carousel({
       <div className="mt-6 hidden justify-end gap-2 md:flex">
         <button
           aria-label="Scroll left"
-          onClick={() => scrollBy(-500)}
+          onClick={() => scrollByAmount(-500)}
           className="flex h-11 w-11 items-center justify-center rounded-full border border-white/15 text-cinema-text transition hover:border-cinema-accent hover:text-cinema-accent"
         >
           ←
         </button>
         <button
           aria-label="Scroll right"
-          onClick={() => scrollBy(500)}
+          onClick={() => scrollByAmount(500)}
           className="flex h-11 w-11 items-center justify-center rounded-full border border-white/15 text-cinema-text transition hover:border-cinema-accent hover:text-cinema-accent"
         >
           →
@@ -640,11 +641,11 @@ function Testimonials() {
           </h2>
         </div>
         <div className="grid gap-6 md:grid-cols-3">
-          {testimonials.map((t, i) => (
+          {testimonials.map((t, index) => (
             <figure
-              key={i}
+              key={index}
               className="reveal flex h-full flex-col rounded-2xl border border-white/10 bg-white/[0.03] p-8 backdrop-blur-md"
-              style={{ transitionDelay: `${i * 80}ms` }}
+              style={{ transitionDelay: `${index * 80}ms` }}
             >
               <div className="font-display text-5xl leading-none text-cinema-accent">
                 “

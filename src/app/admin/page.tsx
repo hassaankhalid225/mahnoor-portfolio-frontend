@@ -1,4 +1,5 @@
 'use client'
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { useState, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -242,7 +243,7 @@ function VideoManager({ type, endpoint }: { type: string; endpoint: string }) {
                       </button>
                     </div>
                     <button
-                      onClick={() => confirm("Delete this?") && deleteMutation.mutate(item.id)}
+                      onClick={() => window.confirm("Delete this?") && deleteMutation.mutate(item.id)}
                       className="rounded-lg bg-red-500/10 p-2.5 text-red-500 transition hover:bg-red-500 hover:text-white"
                     >
                       <Trash2 className="h-4 w-4" />
@@ -429,7 +430,7 @@ function PosterManager() {
               <div className="flex items-center gap-2">
                 {!String(p.id).startsWith("temp-") && (
                   <button
-                    onClick={() => confirm("Delete this poster?") && deleteMutation.mutate(p.id)}
+                    onClick={() => window.confirm("Delete this poster?") && deleteMutation.mutate(p.id)}
                     className="rounded bg-red-500/10 p-2 text-red-500 hover:bg-red-500 hover:text-white transition"
                   >
                     <Trash2 className="h-4 w-4" />
