@@ -175,6 +175,8 @@ function VideoManager({ type, endpoint }: { type: string; endpoint: string }) {
       return;
     }
 
+    console.log("Uploading Video ID:", extractedId);
+
     createMutation.mutate({
       title,
       url: type === "short" ? `https://youtube.com/shorts/${extractedId}` : `https://youtube.com/watch?v=${extractedId}`,
