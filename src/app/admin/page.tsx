@@ -17,7 +17,8 @@ import { toast } from "sonner";
 import Link from "next/link";
 import Image from "next/image";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_VITE_API_URL || "http://localhost:8000";
+const RAW_API_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_VITE_API_URL || "http://localhost:8000";
+const API_URL = RAW_API_URL.replace(/^http:\/\/(?!localhost)/, "https://");
 
 function TabButton({ active, onClick, icon, label }: any) {
   return (
