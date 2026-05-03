@@ -131,18 +131,59 @@ function VideoManager({ type, endpoint }: { type: string; endpoint: string }) {
   const handleAdd = (e: React.FormEvent) => {
     e.preventDefault();
     if (!title || !youtubeId) {
-      setBanner({ status: "error", message: "✗ Please fill in both Title and YouTube ID." });
+      setBanner({ status: "error", message: "✗ Please fill in both Title and YouTube Link." });
       toast.error("Please fill all fields");
       setTimeout(() => setBanner(null), 4000);
       return;
     }
+
+    let extractedId = youtubeId.trim();
+    let isShort = false;
+
+    if (extractedId.includes("youtube.com") || extractedId.includes("youtu.be")) {
+      if (extractedId.includes("/shorts/")) {
+        isShort = true;
+        extractedId = extractedId.split("/shorts/")[1].split("?")[0];
+      } else if (extractedId.includes("youtu.be/")) {
+        extractedId = extractedId.split("youtu.be/")[1].split("?")[0];
+      } else if (extractedId.includes("watch?v=")) {
+        extractedId = extractedId.split("watch?v=")[1].split("&")[0];
+      } else {
+        toast.error("Invalid YouTube link format.");
+        setBanner({ status: "error", message: "✗ Invalid YouTube link format." });
+        setTimeout(() => setBanner(null), 4000);
+        return;
+      }
+    } else {
+      toast.error("Please provide a valid YouTube link.");
+      setBanner({ status: "error", message: "✗ Please enter a valid YouTube link (https://...)." });
+      setTimeout(() => setBanner(null), 4000);
+      return;
+    }
+
+    if (type === "short" && !isShort) {
+      toast.error("Please enter a YouTube Shorts link.");
+      setBanner({ status: "error", message: "✗ Please enter a YouTube Shorts link for this section." });
+      setTimeout(() => setBanner(null), 4000);
+      return;
+    }
+
+    if (type === "video" && isShort) {
+      toast.error("Please enter a standard video link, not a Short.");
+      setBanner({ status: "error", message: "✗ Please enter a standard YouTube video link here." });
+      setTimeout(() => setBanner(null), 4000);
+      return;
+    }
+
     createMutation.mutate({
       title,
-      url: `https://youtube.com/watch?v=${youtubeId}`,
-      youtube_id: youtubeId,
-      type,
+      url: type === "short" ? `https://youtube.com/shorts/${extractedId}` : `https://youtube.com/watch?v=${extractedId}`,
+      youtube_id: extractedId,
       order: items.length,
     });
+    
+    setTitle("");
+    setYoutubeId("");
   };
 
   const moveItem = (index: number, direction: "up" | "down") => {
@@ -173,12 +214,12 @@ function VideoManager({ type, endpoint }: { type: string; endpoint: string }) {
           />
         </div>
         <div className="flex-1">
-          <label className="mb-2 block text-xs text-cinema-muted uppercase tracking-wider">YouTube Video ID</label>
+          <label className="mb-2 block text-xs text-cinema-muted uppercase tracking-wider">YouTube Link</label>
           <input
             type="text"
             value={youtubeId}
             onChange={(e) => setYoutubeId(e.target.value)}
-            placeholder="E.g., dQw4w9WgXcQ"
+            placeholder="E.g., https://youtube.com/watch?v=..."
             className="w-full rounded-lg border border-white/10 bg-black/50 p-3 text-white placeholder-white/30 outline-none focus:border-cinema-accent"
           />
         </div>

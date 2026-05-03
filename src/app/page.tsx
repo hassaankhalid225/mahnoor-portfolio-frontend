@@ -434,7 +434,7 @@ function VideosSection({ onOpen }: { onOpen: (s: ModalState) => void }) {
   const { data: videos = [] } = useQuery({
     queryKey: ["/videos"],
     queryFn: async () => {
-      const res = await fetch(`${API_URL}/videos`);
+      const res = await fetch(`${API_URL}/videos/`);
       if (!res.ok) return [];
       return res.json();
     },
@@ -500,7 +500,7 @@ function ShortsSection({ onOpen }: { onOpen: (s: ModalState) => void }) {
   const { data: shorts = [] } = useQuery({
     queryKey: ["/shorts"],
     queryFn: async () => {
-      const res = await fetch(`${API_URL}/shorts`);
+      const res = await fetch(`${API_URL}/shorts/`);
       if (!res.ok) return [];
       return res.json();
     },
