@@ -86,6 +86,15 @@ const testimonials = [
 
 type ModalState = { id: string; vertical: boolean } | null;
 
+function extractYouTubeId(raw: string): string {
+  if (!raw) return "";
+  const s = raw.trim();
+  if (s.includes("/shorts/")) return s.split("/shorts/")[1].split("?")[0];
+  if (s.includes("youtu.be/")) return s.split("youtu.be/")[1].split("?")[0];
+  if (s.includes("watch?v=")) return s.split("watch?v=")[1].split("&")[0];
+  return s;
+}
+
 function VideoModal({ state, onClose }: { state: ModalState; onClose: () => void }) {
   useEffect(() => {
     if (!state) return;
@@ -99,7 +108,8 @@ function VideoModal({ state, onClose }: { state: ModalState; onClose: () => void
   }, [state, onClose]);
 
   if (!state) return null;
-  const src = `https://www.youtube.com/embed/${state.id}?autoplay=1&rel=0`;
+  const cleanId = extractYouTubeId(state.id);
+  const src = `https://www.youtube.com/embed/${cleanId}?autoplay=1&rel=0`;
 
   return (
     <div
@@ -157,15 +167,6 @@ function useReveal() {
   }, []);
 }
 
-function extractYouTubeId(raw: string): string {
-  if (!raw) return "";
-  const s = raw.trim();
-  if (s.includes("/shorts/")) return s.split("/shorts/")[1].split("?")[0];
-  if (s.includes("youtu.be/")) return s.split("youtu.be/")[1].split("?")[0];
-  if (s.includes("watch?v=")) return s.split("watch?v=")[1].split("&")[0];
-  // already a plain ID (no slashes / dots)
-  return s;
-}
 
 function thumbUrl(id: string) {
   const cleanId = extractYouTubeId(id);
