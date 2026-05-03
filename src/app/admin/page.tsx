@@ -1,6 +1,15 @@
 'use client'
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+function extractYouTubeId(raw: string): string {
+  if (!raw) return "";
+  const s = raw.trim();
+  if (s.includes("/shorts/")) return s.split("/shorts/")[1].split("?")[0];
+  if (s.includes("youtu.be/")) return s.split("youtu.be/")[1].split("?")[0];
+  if (s.includes("watch?v=")) return s.split("watch?v=")[1].split("&")[0];
+  return s;
+}
+
 import { useState, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { ArrowUp, ArrowDown, Trash2, Upload, Plus, Video, PlaySquare, Image as ImageIcon, Loader2, CheckCircle2, XCircle } from "lucide-react";
@@ -258,7 +267,7 @@ function VideoManager({ type, endpoint }: { type: string; endpoint: string }) {
                 </div>
                 <div className="relative h-12 w-20 flex-shrink-0">
                   <Image
-                    src={`https://img.youtube.com/vi/${item.youtube_id}/hqdefault.jpg`}
+                    src={`https://img.youtube.com/vi/${extractYouTubeId(item.youtube_id)}/hqdefault.jpg`}
                     className="rounded object-cover"
                     alt="thumb"
                     fill
@@ -267,7 +276,7 @@ function VideoManager({ type, endpoint }: { type: string; endpoint: string }) {
                 </div>
                 <div className="min-w-0">
                   <h3 className="truncate font-medium text-white">{item.title}</h3>
-                  <p className="text-xs text-cinema-muted">ID: {item.youtube_id}</p>
+                  <p className="text-xs text-cinema-muted">ID: {extractYouTubeId(item.youtube_id)}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">

@@ -157,8 +157,19 @@ function useReveal() {
   }, []);
 }
 
+function extractYouTubeId(raw: string): string {
+  if (!raw) return "";
+  const s = raw.trim();
+  if (s.includes("/shorts/")) return s.split("/shorts/")[1].split("?")[0];
+  if (s.includes("youtu.be/")) return s.split("youtu.be/")[1].split("?")[0];
+  if (s.includes("watch?v=")) return s.split("watch?v=")[1].split("&")[0];
+  // already a plain ID (no slashes / dots)
+  return s;
+}
+
 function thumbUrl(id: string) {
-  return `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
+  const cleanId = extractYouTubeId(id);
+  return `https://img.youtube.com/vi/${cleanId}/hqdefault.jpg`;
 }
 
 
