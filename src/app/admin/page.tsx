@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import Link from "next/link";
 import Image from "next/image";
 
-const API_URL = process.env.NEXT_PUBLIC_VITE_API_URL || "http://localhost:8000";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_VITE_API_URL || "http://localhost:8000";
 
 function TabButton({ active, onClick, icon, label }: any) {
   return (

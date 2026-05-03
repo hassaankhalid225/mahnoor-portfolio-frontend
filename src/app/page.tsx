@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 
-const API_URL = process.env.NEXT_PUBLIC_VITE_API_URL || "http://localhost:8000";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_VITE_API_URL || "http://localhost:8000";
 
 /* ---------------- EDITABLE DATA ---------------- */
 
