@@ -3,6 +3,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import Image from "next/image";
 
 const API_URL = process.env.NEXT_PUBLIC_VITE_API_URL || "http://localhost:8000";
 
@@ -159,9 +160,7 @@ function useReveal() {
 function thumbUrl(id: string) {
   return `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
 }
-function fallbackThumb(id: string) {
-  return `https://img.youtube.com/vi/${id}/mqdefault.jpg`;
-}
+
 
 /* ---------------- COMPONENTS ---------------- */
 
@@ -462,13 +461,12 @@ function VideosSection({ onOpen }: { onOpen: (s: ModalState) => void }) {
               className="group relative w-[88vw] flex-shrink-0 snap-start overflow-hidden rounded-2xl border border-white/10 bg-cinema-surface text-left transition hover:border-cinema-accent/60 md:w-[640px]"
             >
               <div className="relative aspect-video overflow-hidden">
-                <img
+                <Image
                   src={thumbUrl(v.youtube_id)}
                   alt={v.title}
+                  fill
+                  sizes="(max-width: 768px) 88vw, 640px"
                   loading="lazy"
-                  onError={(e) => {
-                    (e.currentTarget as HTMLImageElement).src = fallbackThumb(v.youtube_id);
-                  }}
                   className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
@@ -529,13 +527,12 @@ function ShortsSection({ onOpen }: { onOpen: (s: ModalState) => void }) {
               className="group relative w-[60vw] flex-shrink-0 snap-start overflow-hidden rounded-2xl border border-white/10 bg-black text-left transition hover:border-cinema-accent/60 sm:w-[44vw] md:w-[240px]"
               style={{ aspectRatio: "9 / 16" }}
             >
-              <img
+              <Image
                 src={thumbUrl(s.youtube_id)}
                 alt={s.title}
+                fill
+                sizes="(max-width: 768px) 60vw, (max-width: 1024px) 44vw, 240px"
                 loading="lazy"
-                onError={(e) => {
-                  (e.currentTarget as HTMLImageElement).src = fallbackThumb(s.youtube_id);
-                }}
                 className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent" />
@@ -607,9 +604,11 @@ function PostersSection() {
                   className="group relative w-[80vw] flex-shrink-0 snap-start overflow-hidden rounded-2xl border border-white/10 bg-black text-left transition hover:border-cinema-accent/60 md:w-[400px]"
                   style={{ aspectRatio: "4 / 5" }}
                 >
-                  <img
+                  <Image
                     src={optimizedSrc}
                     alt="Poster"
+                    fill
+                    sizes="(max-width: 768px) 80vw, 400px"
                     loading="lazy"
                     className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105"
                   />

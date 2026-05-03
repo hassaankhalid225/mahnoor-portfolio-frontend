@@ -3,9 +3,10 @@
 
 import { useState, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { ArrowUp, ArrowDown, Trash2, Upload, Plus, Video, PlaySquare, Image as ImageIcon, Loader2, RefreshCcw, CheckCircle2, XCircle } from "lucide-react";
+import { ArrowUp, ArrowDown, Trash2, Upload, Plus, Video, PlaySquare, Image as ImageIcon, Loader2, CheckCircle2, XCircle } from "lucide-react";
 import { toast } from "sonner";
 import Link from "next/link";
+import Image from "next/image";
 
 const API_URL = process.env.NEXT_PUBLIC_VITE_API_URL || "http://localhost:8000";
 
@@ -212,11 +213,15 @@ function VideoManager({ type, endpoint }: { type: string; endpoint: string }) {
                 <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-cinema-accent/20 text-xs font-bold text-cinema-accent border border-cinema-accent/30">
                   {idx + 1}
                 </div>
-                <img
-                  src={`https://img.youtube.com/vi/${item.youtube_id}/hqdefault.jpg`}
-                  className="h-12 w-20 flex-shrink-0 rounded object-cover"
-                  alt="thumb"
-                />
+                <div className="relative h-12 w-20 flex-shrink-0">
+                  <Image
+                    src={`https://img.youtube.com/vi/${item.youtube_id}/hqdefault.jpg`}
+                    className="rounded object-cover"
+                    alt="thumb"
+                    fill
+                    sizes="80px"
+                  />
+                </div>
                 <div className="min-w-0">
                   <h3 className="truncate font-medium text-white">{item.title}</h3>
                   <p className="text-xs text-cinema-muted">ID: {item.youtube_id}</p>
@@ -332,17 +337,7 @@ function PosterManager() {
     },
   });
 
-  const moveItem = (index: number, direction: "up" | "down") => {
-    if (direction === "up" && index === 0) return;
-    if (direction === "down" && index === posters.length - 1) return;
-    const newItems = [...posters];
-    const targetIndex = direction === "up" ? index - 1 : index + 1;
-    const currentOrder = newItems[index].order;
-    newItems[index].order = newItems[targetIndex].order;
-    newItems[targetIndex].order = currentOrder;
-    // Assuming a reorder endpoint exists for posters too, or just invalidate
-    queryClient.invalidateQueries({ queryKey: ["/posters"] });
-  };
+
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0] || null;
@@ -376,7 +371,14 @@ function PosterManager() {
         />
         {previewUrl ? (
           <div className="flex flex-col items-center gap-3">
-            <img src={previewUrl} alt="preview" className="h-32 rounded-lg object-cover shadow-lg border border-cinema-accent/30" />
+            <div className="relative h-32 w-48 overflow-hidden rounded-lg shadow-lg border border-cinema-accent/30">
+              <Image 
+                src={previewUrl} 
+                alt="preview" 
+                fill 
+                className="object-cover" 
+              />
+            </div>
             <p className="text-sm text-cinema-accent font-medium">{file?.name}</p>
             <p className="text-xs text-cinema-muted">Click to change</p>
           </div>
@@ -420,11 +422,15 @@ function PosterManager() {
                 <div className="flex h-6 w-6 items-center justify-center rounded-full bg-cinema-accent/20 text-[10px] font-bold text-cinema-accent">
                   {idx + 1}
                 </div>
-                <img
-                  src={p.secure_url}
-                  className="h-14 w-12 rounded object-cover border border-white/10"
-                  alt="poster"
-                />
+                <div className="relative h-14 w-12 flex-shrink-0">
+                  <Image
+                    src={p.secure_url}
+                    className="rounded object-cover border border-white/10"
+                    alt="poster"
+                    fill
+                    sizes="48px"
+                  />
+                </div>
                 <p className="text-xs text-cinema-muted truncate max-w-[150px]">{p.public_id}</p>
               </div>
               <div className="flex items-center gap-2">
