@@ -5,8 +5,8 @@ import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 
-const RAW_API_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_VITE_API_URL || "http://localhost:8000";
-const API_URL = RAW_API_URL.replace(/^http:\/\/(?!localhost)/, "https://");
+const RAW_API_URL = process.env.NEXT_PUBLIC_API_URL || "https://mahnoor-portfolio-backend-production.up.railway.app";
+const API_URL = RAW_API_URL.startsWith("http://") && !RAW_API_URL.includes("localhost") ? RAW_API_URL.replace("http://", "https://") : RAW_API_URL;
 
 /* ---------------- EDITABLE DATA ---------------- */
 
