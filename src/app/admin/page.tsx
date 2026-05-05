@@ -26,8 +26,8 @@ function TabButton({ active, onClick, icon, label }: any) {
       onClick={onClick}
       className={`flex flex-1 items-center justify-center rounded-lg py-3 text-sm font-medium transition-all ${
         active
-          ? "bg-cinema-accent text-white shadow-[0_0_15px_rgba(236,72,153,0.3)]"
-          : "text-cinema-muted hover:bg-white/5 hover:text-white"
+          ? "bg-primary text-background shadow-[0_0_15px_rgba(212,175,55,0.3)]"
+          : "text-muted hover:bg-white/5 hover:text-white"
       }`}
     >
       {icon}
@@ -216,29 +216,29 @@ function VideoManager({ type, endpoint }: { type: string; endpoint: string }) {
     <div className="space-y-6">
       <form onSubmit={handleAdd} className="flex flex-col gap-4 md:flex-row md:items-end">
         <div className="flex-1">
-          <label className="mb-2 block text-xs text-cinema-muted uppercase tracking-wider">Title</label>
+          <label className="mb-2 block text-xs text-muted uppercase tracking-wider">Title</label>
           <input
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="E.g., Cinematic B-Roll"
-            className="w-full rounded-lg border border-white/10 bg-black/50 p-3 text-white placeholder-white/30 outline-none focus:border-cinema-accent"
+            className="w-full rounded-lg border border-white/10 bg-black/50 p-3 text-white placeholder-white/30 outline-none focus:border-primary"
           />
         </div>
         <div className="flex-1">
-          <label className="mb-2 block text-xs text-cinema-muted uppercase tracking-wider">YouTube Link</label>
+          <label className="mb-2 block text-xs text-muted uppercase tracking-wider">YouTube Link</label>
           <input
             type="text"
             value={youtubeId}
             onChange={(e) => setYoutubeId(e.target.value)}
             placeholder="E.g., https://youtube.com/watch?v=..."
-            className="w-full rounded-lg border border-white/10 bg-black/50 p-3 text-white placeholder-white/30 outline-none focus:border-cinema-accent"
+            className="w-full rounded-lg border border-white/10 bg-black/50 p-3 text-white placeholder-white/30 outline-none focus:border-primary"
           />
         </div>
         <button
           type="submit"
           disabled={createMutation.isPending}
-          className="flex h-12 items-center justify-center gap-2 rounded-lg bg-cinema-accent px-6 font-medium text-white transition hover:bg-pink-600 disabled:opacity-50"
+          className="flex h-12 items-center justify-center gap-2 rounded-lg bg-primary px-6 font-medium text-background transition hover:opacity-90 disabled:opacity-50"
         >
           {createMutation.isPending ? <Loader2 className="animate-spin h-5 w-5" /> : <Plus className="h-5 w-5" />}
           Add {type === "video" ? "Video" : "Short"}
@@ -249,7 +249,7 @@ function VideoManager({ type, endpoint }: { type: string; endpoint: string }) {
         {isLoading ? (
           <div className="animate-pulse h-16 w-full rounded-lg bg-white/5" />
         ) : items.length === 0 ? (
-          <div className="p-8 text-center text-cinema-muted border border-dashed border-white/10 rounded-xl">
+          <div className="p-8 text-center text-muted border border-dashed border-white/10 rounded-xl">
             No items found. Add some above!
           </div>
         ) : (
@@ -263,7 +263,7 @@ function VideoManager({ type, endpoint }: { type: string; endpoint: string }) {
               }`}
             >
               <div className="flex items-center gap-4">
-                <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-cinema-accent/20 text-xs font-bold text-cinema-accent border border-cinema-accent/30">
+                <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-primary/20 text-xs font-bold text-primary border border-primary/30">
                   {idx + 1}
                 </div>
                 <div className="relative h-12 w-20 flex-shrink-0">
@@ -277,7 +277,7 @@ function VideoManager({ type, endpoint }: { type: string; endpoint: string }) {
                 </div>
                 <div className="min-w-0">
                   <h3 className="truncate font-medium text-white">{item.title}</h3>
-                  <p className="text-xs text-cinema-muted">ID: {extractYouTubeId(item.youtube_id)}</p>
+                  <p className="text-xs text-muted">ID: {extractYouTubeId(item.youtube_id)}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
@@ -287,7 +287,7 @@ function VideoManager({ type, endpoint }: { type: string; endpoint: string }) {
                       <button
                         onClick={() => moveItem(idx, "up")}
                         disabled={idx === 0}
-                        className="p-1.5 text-cinema-muted hover:text-white disabled:opacity-20 transition"
+                        className="p-1.5 text-muted hover:text-white disabled:opacity-20 transition"
                       >
                         <ArrowUp className="h-4 w-4" />
                       </button>
@@ -295,7 +295,7 @@ function VideoManager({ type, endpoint }: { type: string; endpoint: string }) {
                       <button
                         onClick={() => moveItem(idx, "down")}
                         disabled={idx === items.length - 1}
-                        className="p-1.5 text-cinema-muted hover:text-white disabled:opacity-20 transition"
+                        className="p-1.5 text-muted hover:text-white disabled:opacity-20 transition"
                       >
                         <ArrowDown className="h-4 w-4" />
                       </button>
@@ -437,9 +437,9 @@ function PosterManager() {
           </div>
         ) : (
           <>
-            <Upload className="mx-auto h-10 w-10 mb-3 text-cinema-muted" />
+            <Upload className="mx-auto h-10 w-10 mb-3 text-muted" />
             <h3 className="text-base font-medium text-white mb-1 text-center">Select a poster image</h3>
-            <p className="text-xs text-cinema-muted text-center">Click to browse</p>
+            <p className="text-xs text-muted text-center">Click to browse</p>
           </>
         )}
       </div>
@@ -447,7 +447,7 @@ function PosterManager() {
         <button
           onClick={handleUpload}
           disabled={!file || uploadMutation.isPending}
-          className="flex-1 flex h-12 items-center justify-center gap-2 rounded-xl bg-cinema-accent font-medium text-white transition hover:bg-pink-600 disabled:opacity-50"
+          className="flex-1 flex h-12 items-center justify-center gap-2 rounded-xl bg-primary font-medium text-background transition hover:opacity-90 disabled:opacity-50"
         >
           {uploadMutation.isPending ? <Loader2 className="animate-spin h-5 w-5" /> : <Upload className="h-5 w-5" />}
           Upload Poster
@@ -484,7 +484,7 @@ function PosterManager() {
                     sizes="48px"
                   />
                 </div>
-                <p className="text-xs text-cinema-muted truncate max-w-[150px]">{p.public_id}</p>
+                <p className="text-xs text-muted truncate max-w-[150px]">{p.public_id}</p>
               </div>
               <div className="flex items-center gap-2">
                 {!String(p.id).startsWith("temp-") && (
@@ -508,18 +508,18 @@ export default function AdminPage() {
   const [activeTab, setActiveTab] = useState<"videos" | "shorts" | "posters">("videos");
 
   return (
-    <div className="min-h-screen bg-cinema-bg text-cinema-text font-body p-6 md:p-12">
+    <div className="min-h-screen bg-background text-foreground font-body p-6 md:p-12">
       <div className="mx-auto max-w-5xl space-y-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="font-display text-4xl text-cinema-accent md:text-5xl">
+            <h1 className="font-display text-4xl text-primary md:text-5xl">
               Admin Panel
             </h1>
-            <p className="text-cinema-muted mt-2 text-sm">
+            <p className="text-muted mt-2 text-sm">
               Manage your portfolio content dynamically.
             </p>
           </div>
-          <Link href="/" className="text-xs uppercase tracking-widest text-cinema-muted hover:text-cinema-accent transition">
+          <Link href="/" className="text-xs uppercase tracking-widest text-muted hover:text-primary transition">
             ← Back to Portfolio
           </Link>
         </div>

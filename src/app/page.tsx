@@ -1,91 +1,77 @@
 'use client'
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
+import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
+import { 
+  Play, 
+  ArrowRight, 
+  Mail, 
+  Smartphone, 
+  Video, 
+  Layers, 
+  CheckCircle2,
+  X,
+  Target,
+  Zap,
+  Star,
+  Quote,
+  ArrowUpRight,
+  TrendingUp,
+  Award,
+  Users,
+  MessageCircle
+} from "lucide-react";
 
 const RAW_API_URL = process.env.NEXT_PUBLIC_API_URL || "https://mahnoor-portfolio-backend-production.up.railway.app";
 const API_URL = RAW_API_URL.startsWith("http://") && !RAW_API_URL.includes("localhost") ? RAW_API_URL.replace("http://", "https://") : RAW_API_URL;
 
-/* ---------------- EDITABLE DATA ---------------- */
+/* ---------------- DATA ---------------- */
 
-const editorData = {
+const profile = {
   name: "Mahnoor Fatima",
-  title: "Video Editor & Motion Designer",
-  tagline: "I don't edit videos. I craft stories.",
-  bio: "Detail-obsessed video editor crafting cinematic Reels, Shorts, podcast cuts and long-form YouTube edits. I blend motion graphics, typography and rhythm to turn raw footage into stories that hold attention.",
-  email: "mahnoorfatim09@gmail.com",
-  whatsapp: "923297765694",
-  whatsappDisplay: "+92 329 7765694",
-  instagram: "mahnoorfatima.edits",
-  linkedin: "mahnoorfatimavideoeditor",
-  behance:
-    "https://www.behance.net/gallery/243524121/Short-Form-Video-Editing-for-Reels-Shorts-Podcasts",
+  role: "Lead Creative Editor",
+  company: "Visual Edge Media",
+  bio: "Transforming raw footage into high-conversion digital assets. With a focus on the 'Psychology of the Cut', I help global creators and brands dominate the attention economy through strategic storytelling and cinematic precision.",
   stats: [
-    { value: "50+", label: "Edits Delivered" },
-    { value: "4+", label: "Years Practising" },
-    { value: "15+", label: "Reels & Shorts" },
-    { value: "100%", label: "Hand-Crafted" },
+    { label: "Views Generated", value: "15M+" },
+    { label: "Projects Completed", value: "120+" },
+    { label: "Retention Rate", value: "85%+" },
+    { label: "Client Satisfaction", value: "4.9/5" }
   ],
-  tools: [
-    "Adobe Premiere Pro",
-    "After Effects",
-    "DaVinci Resolve",
-    "CapCut",
-    "Canva",
-    "Photoshop",
-    "Illustrator",
+  services: [
+    {
+      title: "Viral Short-Form",
+      desc: "Retention-optimized Reels & Shorts with custom motion graphics.",
+      icon: <Zap className="w-8 h-8" />
+    },
+    {
+      title: "Cinematic Long-Form",
+      desc: "Story-driven YouTube editing that keeps viewers watching until the end.",
+      icon: <Video className="w-8 h-8" />
+    },
+    {
+      title: "Post-Production",
+      desc: "Color grading, sound design, and professional B-roll integration.",
+      icon: <Layers className="w-8 h-8" />
+    }
   ],
+  workflow: [
+    { step: "01", title: "Strategy Call", desc: "We define your hook, audience, and goals." },
+    { step: "02", title: "First Cut", desc: "Focusing on narrative flow and core story." },
+    { step: "03", title: "The Polish", desc: "Sound design, color, and motion graphics." },
+    { step: "04", title: "Final Delivery", desc: "Ready-to-post assets for all platforms." }
+  ],
+  faq: [
+    { q: "What is your typical turnaround time?", a: "Short-form edits usually take 24-48 hours, while long-form projects range from 3-5 days depending on complexity." },
+    { q: "Do you offer sound design and color grading?", a: "Yes, every edit includes professional sound design and cinematic color grading as standard." },
+    { q: "Which software do you use?", a: "I primarily work in Adobe Premiere Pro and After Effects, with DaVinci Resolve for high-end color grading." }
+  ]
 };
 
-const services = [
-  {
-    icon: "▶",
-    title: "Short-form Reels & Shorts",
-    desc: "Snappy 9:16 edits engineered for retention, trends and the algorithm.",
-  },
-  {
-    icon: "◉",
-    title: "Long-form YouTube Edits",
-    desc: "Story-led pacing, B-roll, sound design and chapters that keep viewers watching.",
-  },
-  {
-    icon: "✦",
-    title: "Motion Graphics & Typography",
-    desc: "Kinetic type, animated logos, lower-thirds and frame-perfect transitions.",
-  },
-  {
-    icon: "◐",
-    title: "Color Grading & Polish",
-    desc: "Cinematic LUTs, mood-driven grades and clean audio for a premium finish.",
-  },
-];
-
-const testimonials = [
-  {
-    quote:
-      "Mahnoor turned hours of raw footage into a reel that actually felt like a film. Pacing, sound, color — all on point.",
-    author: "Creator Client",
-    role: "Podcast Host",
-  },
-  {
-    quote:
-      "Reliable, fast and creative. Every cut had intention. My retention graph speaks for itself.",
-    author: "YouTube Creator",
-    role: "Lifestyle Channel",
-  },
-  {
-    quote:
-      "The typography and motion work elevated our brand reels to a whole new level.",
-    author: "Brand Manager",
-    role: "DTC Startup",
-  },
-];
-
-/* ---------------- MODAL ---------------- */
-
-type ModalState = { id: string; vertical: boolean } | null;
+/* ---------------- HELPERS ---------------- */
 
 function extractYouTubeId(raw: string): string {
   if (!raw) return "";
@@ -96,689 +82,363 @@ function extractYouTubeId(raw: string): string {
   return s;
 }
 
-function VideoModal({ state, onClose }: { state: ModalState; onClose: () => void }) {
-  useEffect(() => {
-    if (!state) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
-    document.addEventListener("keydown", onKey);
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = "";
-    };
-  }, [state, onClose]);
-
-  if (!state) return null;
-  const cleanId = extractYouTubeId(state.id);
-  const src = `https://www.youtube.com/embed/${cleanId}?autoplay=1&rel=0`;
-
-  return (
-    <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 p-4 backdrop-blur-sm animate-in fade-in"
-      onClick={onClose}
-      role="dialog"
-      aria-modal="true"
-    >
-      <button
-        onClick={onClose}
-        aria-label="Close video"
-        className="absolute right-4 top-4 z-10 flex h-11 w-11 items-center justify-center rounded-full border border-white/20 text-cinema-text transition hover:border-cinema-accent hover:text-cinema-accent"
-      >
-        ✕
-      </button>
-      <div
-        className={
-          state.vertical
-            ? "relative w-full max-w-[400px] overflow-hidden rounded-xl bg-black shadow-2xl"
-            : "relative w-full max-w-5xl overflow-hidden rounded-xl bg-black shadow-2xl"
-        }
-        style={{ aspectRatio: state.vertical ? "9 / 16" : "16 / 9" }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <iframe
-          src={src}
-          title="YouTube video"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-          className="absolute inset-0 h-full w-full"
-        />
-      </div>
-    </div>
-  );
-}
-
-/* ---------------- HELPERS ---------------- */
-
-function useReveal() {
-  useEffect(() => {
-    const els = document.querySelectorAll<HTMLElement>(".reveal");
-    const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) {
-            e.target.classList.add("is-visible");
-            io.unobserve(e.target);
-          }
-        });
-      },
-      { threshold: 0.12 },
-    );
-    els.forEach((el) => io.observe(el));
-    return () => io.disconnect();
-  }, []);
-}
-
-
 function thumbUrl(id: string) {
   const cleanId = extractYouTubeId(id);
-  return `https://img.youtube.com/vi/${cleanId}/hqdefault.jpg`;
+  return `https://img.youtube.com/vi/${cleanId}/maxresdefault.jpg`;
 }
-
 
 /* ---------------- COMPONENTS ---------------- */
 
-function Nav({ onContact }: { onContact: () => void }) {
+function Navbar() {
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 50);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
-    <header className="fixed inset-x-0 top-0 z-50 backdrop-blur-md">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 md:px-10">
-        <a href="#top" className="font-display text-2xl tracking-widest text-cinema-text">
-          MF<span className="text-cinema-accent">.</span>
-        </a>
-        <nav className="hidden items-center gap-8 text-sm uppercase tracking-[0.18em] text-cinema-muted md:flex">
-          {[
-            { href: "#work", label: "Work" },
-            { href: "#shorts", label: "Shorts" },
-            { href: "#posters", label: "Posters" },
-            { href: "#about", label: "About" },
-            { href: "#services", label: "Services" },
-          ].map((l) => (
-            <a
-              key={l.href}
-              href={l.href}
-              className="transition hover:text-cinema-accent"
-            >
-              {l.label}
+    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled ? 'py-4 bg-background/90 backdrop-blur-xl border-b border-white/5' : 'py-8'}`}>
+      <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center font-black">M</div>
+          <span className="text-xl font-bold tracking-tighter uppercase">Mahnoor Fatima</span>
+        </div>
+        <div className="hidden lg:flex items-center gap-10">
+          {['Portfolio', 'Services', 'Workflow', 'FAQ'].map((item) => (
+            <a key={item} href={`#${item.toLowerCase()}`} className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/50 hover:text-primary transition-colors">
+              {item}
             </a>
           ))}
-        </nav>
-        <button
-          onClick={onContact}
-          className="rounded-full border border-cinema-accent/60 px-4 py-2 text-xs uppercase tracking-[0.2em] text-cinema-accent transition hover:bg-cinema-accent hover:text-cinema-bg"
-        >
-          Contact
-        </button>
+        </div>
+        <a href="#contact" className="btn-primary py-3 px-8 text-xs font-bold">Start A Project</a>
       </div>
-    </header>
+    </nav>
   );
 }
 
-function Hero() {
-  const words = "I DON'T EDIT VIDEOS. I CRAFT STORIES.".split(" ");
+function VideoModal({ video, onClose }: { video: any; onClose: () => void }) {
+  if (!video) return null;
+  const cleanId = extractYouTubeId(video.id);
+  const src = `https://www.youtube.com/embed/${cleanId}?autoplay=1&rel=0`;
+
   return (
-    <section
-      id="top"
-      className="grain relative flex min-h-screen items-center overflow-hidden bg-cinema-bg pt-24"
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 p-4 backdrop-blur-2xl"
+      onClick={onClose}
     >
-      <div
-        className="mesh-anim absolute -left-1/4 -top-1/4 h-[80vh] w-[80vh] rounded-full opacity-60 blur-3xl"
-        style={{
-          background:
-            "radial-gradient(circle at 30% 30%, rgba(236,72,153,0.25), transparent 60%)",
-        }}
-      />
-      <div
-        className="mesh-anim absolute -bottom-1/3 -right-1/4 h-[70vh] w-[70vh] rounded-full opacity-50 blur-3xl"
-        style={{
-          background:
-            "radial-gradient(circle at 70% 70%, rgba(37,99,235,0.25), transparent 60%)",
-          animationDelay: "-9s",
-        }}
-      />
-      <div className="relative mx-auto w-full max-w-7xl px-6 md:px-10">
-        <p className="mb-6 inline-flex items-center gap-3 text-xs uppercase tracking-[0.3em] text-cinema-accent">
-          <span className="h-px w-10 bg-cinema-accent" />
-          {editorData.name} — {editorData.title}
-        </p>
-        <h1 className="font-display text-[14vw] leading-[0.9] tracking-tight text-cinema-text md:text-[8.5vw]">
-          {words.map((w: string, index: number) => (
-            <span
-              key={index}
-              className="word-rise mr-3 inline-block"
-              style={{ animationDelay: `${index * 0.08 + 0.1}s` }}
-            >
-              {w === "STORIES." ? (
-                <span className="italic text-cinema-accent">{w}</span>
-              ) : (
-                w
-              )}
-            </span>
-          ))}
-        </h1>
-        <p className="mt-8 max-w-xl text-base text-cinema-muted md:text-lg">
-          A cinematic editor turning raw footage into stories worth watching —
-          Reels, Shorts, podcasts and long-form for creators &amp; brands.
-        </p>
-        <div className="mt-10 flex flex-wrap gap-4">
-          <a
-            href="#work"
-            className="group inline-flex items-center gap-3 rounded-full bg-cinema-accent px-7 py-3.5 text-sm font-medium uppercase tracking-[0.2em] text-cinema-bg transition hover:bg-cinema-accent/90 accent-glow"
-          >
-            Watch My Work
-            <span className="transition group-hover:translate-x-1">→</span>
-          </a>
-          <a
-            href="#contact"
-            className="inline-flex items-center gap-3 rounded-full border border-white/20 px-7 py-3.5 text-sm font-medium uppercase tracking-[0.2em] text-cinema-text transition hover:border-cinema-accent hover:text-cinema-accent"
-          >
-            Contact Me
-          </a>
-        </div>
-      </div>
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-[10px] uppercase tracking-[0.4em] text-cinema-muted">
-        scroll ↓
-      </div>
-    </section>
-  );
-}
-
-function About() {
-  return (
-    <section id="about" className="relative bg-cinema-bg px-6 py-28 md:px-10">
-      <div className="mx-auto grid max-w-7xl gap-16 md:grid-cols-12">
-        <div className="reveal md:col-span-5">
-          <p className="mb-6 text-xs uppercase tracking-[0.3em] text-cinema-accent">
-            01 — About
-          </p>
-          <p className="font-display text-5xl italic leading-[0.95] text-cinema-text md:text-7xl">
-            Every cut is a <span className="text-cinema-accent">decision.</span>
-          </p>
-        </div>
-        <div className="reveal md:col-span-7">
-          <p className="text-lg leading-relaxed text-cinema-text/90 md:text-xl">
-            {editorData.bio}
-          </p>
-          <div className="mt-10">
-            <p className="mb-4 text-xs uppercase tracking-[0.3em] text-cinema-muted">
-              Toolkit
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {editorData.tools.map((t: string) => (
-                <span
-                  key={t}
-                  className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm text-cinema-text/90 backdrop-blur-sm"
-                >
-                  {t}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="reveal mx-auto mt-24 grid max-w-7xl grid-cols-2 gap-px overflow-hidden rounded-2xl border border-white/10 bg-white/5 md:grid-cols-4">
-        {editorData.stats.map((s: any) => (
-          <div key={s.label} className="bg-cinema-bg px-6 py-10 text-center">
-            <div className="font-display text-5xl text-cinema-accent md:text-6xl">
-              {s.value}
-            </div>
-            <div className="mt-2 text-xs uppercase tracking-[0.25em] text-cinema-muted">
-              {s.label}
-            </div>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function Services() {
-  return (
-    <section id="services" className="relative bg-cinema-bg px-6 py-28 md:px-10">
-      <div className="mx-auto max-w-7xl">
-        <div className="reveal mb-16 flex items-end justify-between gap-6">
-          <div>
-            <p className="mb-4 text-xs uppercase tracking-[0.3em] text-cinema-accent">
-              02 — Services
-            </p>
-            <h2 className="font-display text-5xl leading-none text-cinema-text md:text-7xl">
-              What I <span className="italic text-cinema-accent">Cut.</span>
-            </h2>
-          </div>
-        </div>
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {services.map((s: any, i: number) => (
-            <div
-              key={s.title}
-              className="reveal group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] p-7 backdrop-blur-md transition hover:-translate-y-1 hover:border-cinema-accent/50"
-              style={{ transitionDelay: `${i * 60}ms` }}
-            >
-              <div className="mb-8 text-3xl text-cinema-accent">{s.icon}</div>
-              <h3 className="font-display text-2xl tracking-wide text-cinema-text">
-                {s.title}
-              </h3>
-              <p className="mt-3 text-sm leading-relaxed text-cinema-muted">
-                {s.desc}
-              </p>
-              <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-cinema-accent/60 to-transparent opacity-0 transition group-hover:opacity-100" />
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function Carousel({
-  children,
-  scrollerRef,
-}: {
-  children: React.ReactNode;
-  scrollerRef: React.RefObject<HTMLDivElement | null>;
-}) {
-  useEffect(() => {
-    const scroller = scrollerRef.current;
-    if (!scroller) return;
-
-    let animationFrameId: number;
-    let isHovered = false;
-
-    const scrollStep = () => {
-      if (!isHovered && scroller) {
-        scroller.scrollLeft += 1;
-        if (Math.ceil(scroller.scrollLeft) + scroller.clientWidth >= scroller.scrollWidth) {
-          scroller.scrollLeft = 0;
-        }
-      }
-      animationFrameId = requestAnimationFrame(scrollStep);
-    };
-
-    const pause = () => (isHovered = true);
-    const resume = () => (isHovered = false);
-
-    scroller.addEventListener("mouseenter", pause);
-    scroller.addEventListener("mouseleave", resume);
-    scroller.addEventListener("touchstart", pause, { passive: true });
-    scroller.addEventListener("touchend", resume);
-
-    animationFrameId = requestAnimationFrame(scrollStep);
-
-    return () => {
-      cancelAnimationFrame(animationFrameId);
-      scroller.removeEventListener("mouseenter", pause);
-      scroller.removeEventListener("mouseleave", resume);
-      scroller.removeEventListener("touchstart", pause);
-      scroller.removeEventListener("touchend", resume);
-    };
-  }, [scrollerRef]);
-
-  const scrollByAmount = (dx: number) => scrollerRef.current?.scrollBy({ left: dx, behavior: "smooth" });
-
-  return (
-    <div className="relative">
-      <div
-        ref={scrollerRef}
-        className="no-scrollbar -mx-6 flex gap-5 overflow-x-auto px-6 pb-4 md:-mx-10 md:px-10"
+      <button onClick={onClose} className="absolute top-8 right-8 text-white/20 hover:text-white transition-colors">
+        <X className="w-12 h-12" />
+      </button>
+      <motion.div
+        initial={{ scale: 0.95, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        className={`relative w-full overflow-hidden rounded-[2rem] bg-black shadow-2xl ${video.vertical ? 'max-w-[450px]' : 'max-w-6xl'}`}
+        style={{ aspectRatio: video.vertical ? "9/16" : "16/9" }}
+        onClick={(e) => e.stopPropagation()}
       >
-        {children}
-      </div>
-      <div className="mt-6 hidden justify-end gap-2 md:flex">
-        <button
-          aria-label="Scroll left"
-          onClick={() => scrollByAmount(-500)}
-          className="flex h-11 w-11 items-center justify-center rounded-full border border-white/15 text-cinema-text transition hover:border-cinema-accent hover:text-cinema-accent"
-        >
-          ←
-        </button>
-        <button
-          aria-label="Scroll right"
-          onClick={() => scrollByAmount(500)}
-          className="flex h-11 w-11 items-center justify-center rounded-full border border-white/15 text-cinema-text transition hover:border-cinema-accent hover:text-cinema-accent"
-        >
-          →
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function VideosSection({ onOpen }: { onOpen: (s: ModalState) => void }) {
-  const ref = useRef<HTMLDivElement>(null);
-  
-  const { data: videos = [] } = useQuery({
-    queryKey: ["/videos"],
-    queryFn: async () => {
-      const res = await fetch(`${API_URL}/videos/`);
-      if (!res.ok) return [];
-      return res.json();
-    },
-  });
-
-  return (
-    <section id="work" className="relative bg-cinema-bg px-6 py-28 md:px-10">
-      <div className="mx-auto max-w-7xl">
-        <div className="reveal mb-12 flex flex-wrap items-end justify-between gap-6">
-          <div>
-            <p className="mb-4 text-xs uppercase tracking-[0.3em] text-cinema-accent">
-              03 — Featured Videos
-            </p>
-            <h2 className="font-display text-5xl leading-none text-cinema-text md:text-7xl">
-              Long-form, <span className="italic text-cinema-accent">cinematic.</span>
-            </h2>
-          </div>
-        </div>
-        <Carousel scrollerRef={ref}>
-          {videos.length > 0 ? videos.map((v: any) => (
-            <button
-              key={v.id}
-              onClick={() => onOpen({ id: v.youtube_id, vertical: false })}
-              className="group relative w-[88vw] flex-shrink-0 snap-start overflow-hidden rounded-2xl border border-white/10 bg-cinema-surface text-left transition hover:border-cinema-accent/60 md:w-[640px]"
-            >
-              <div className="relative aspect-video overflow-hidden">
-                <Image
-                  src={thumbUrl(v.youtube_id)}
-                  alt={v.title}
-                  fill
-                  sizes="(max-width: 768px) 88vw, 640px"
-                  loading="lazy"
-                  className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="flex h-16 w-16 items-center justify-center rounded-full bg-cinema-accent/95 text-cinema-bg shadow-2xl transition group-hover:scale-110">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M8 5v14l11-7z" />
-                    </svg>
-                  </span>
-                </div>
-              </div>
-              <div className="flex items-center justify-between gap-4 p-5">
-                <h3 className="font-display text-xl tracking-wide text-cinema-text">
-                  {v.title}
-                </h3>
-                <span className="text-cinema-accent">↗</span>
-              </div>
-            </button>
-          )) : (
-            <div className="text-cinema-muted py-10">No featured videos found.</div>
-          )}
-        </Carousel>
-      </div>
-    </section>
-  );
-}
-
-function ShortsSection({ onOpen }: { onOpen: (s: ModalState) => void }) {
-  const ref = useRef<HTMLDivElement>(null);
-
-  const { data: shorts = [] } = useQuery({
-    queryKey: ["/shorts"],
-    queryFn: async () => {
-      const res = await fetch(`${API_URL}/shorts/`);
-      if (!res.ok) return [];
-      return res.json();
-    },
-  });
-
-  return (
-    <section id="shorts" className="relative bg-cinema-surface-2 px-6 py-28 md:px-10">
-      <div className="mx-auto max-w-7xl">
-        <div className="reveal mb-12 flex flex-wrap items-end justify-between gap-6">
-          <div>
-            <p className="mb-4 text-xs uppercase tracking-[0.3em] text-cinema-accent">
-              04 — Shorts &amp; Reels
-            </p>
-            <h2 className="font-display text-5xl leading-none text-cinema-text md:text-7xl">
-              Vertical, <span className="italic text-cinema-accent">addictive.</span>
-            </h2>
-          </div>
-        </div>
-        <Carousel scrollerRef={ref}>
-          {shorts.length > 0 ? shorts.map((s: any) => (
-            <button
-              key={s.id}
-              onClick={() => onOpen({ id: s.youtube_id, vertical: true })}
-              className="group relative w-[60vw] flex-shrink-0 snap-start overflow-hidden rounded-2xl border border-white/10 bg-black text-left transition hover:border-cinema-accent/60 sm:w-[44vw] md:w-[240px]"
-              style={{ aspectRatio: "9 / 16" }}
-            >
-              <Image
-                src={thumbUrl(s.youtube_id)}
-                alt={s.title}
-                fill
-                sizes="(max-width: 768px) 60vw, (max-width: 1024px) 44vw, 240px"
-                loading="lazy"
-                className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent" />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="flex h-14 w-14 items-center justify-center rounded-full bg-cinema-accent/95 text-cinema-bg shadow-2xl transition group-hover:scale-110">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
-                </span>
-              </div>
-              <div className="absolute inset-x-0 bottom-0 p-4">
-                <p className="text-xs uppercase tracking-[0.2em] text-cinema-text/90">
-                  {s.title}
-                </p>
-              </div>
-            </button>
-          )) : (
-            <div className="text-cinema-muted py-10">No shorts found.</div>
-          )}
-        </Carousel>
-      </div>
-    </section>
-  );
-}
-
-function PostersSection() {
-  const { data: posters = [], isLoading } = useQuery({
-    queryKey: ["/posters"],
-    queryFn: async () => {
-      const res = await fetch(`${API_URL}/posters/`);
-      if (!res.ok) return [];
-      return res.json();
-    },
-  });
-
-  const ref = useRef<HTMLDivElement>(null);
-
-  return (
-    <section id="posters" className="relative bg-cinema-bg px-6 py-28 md:px-10">
-      <div className="mx-auto max-w-7xl">
-        <div className="reveal mb-12 flex flex-wrap items-end justify-between gap-6">
-          <div>
-            <p className="mb-4 text-xs uppercase tracking-[0.3em] text-cinema-accent">
-              05 — Posters &amp; Thumbnails
-            </p>
-            <h2 className="font-display text-5xl leading-none text-cinema-text md:text-7xl">
-              Static, <span className="italic text-cinema-accent">impactful.</span>
-            </h2>
-          </div>
-        </div>
-
-        {isLoading ? (
-          <Carousel scrollerRef={ref}>
-            {[1, 2, 3].map((i: number) => (
-              <div
-                key={i}
-                className="group relative w-[80vw] flex-shrink-0 snap-start overflow-hidden rounded-2xl border border-white/10 bg-white/10 md:w-[400px] animate-pulse"
-                style={{ aspectRatio: "4 / 5" }}
-              />
-            ))}
-          </Carousel>
-        ) : posters.length > 0 ? (
-          <Carousel scrollerRef={ref}>
-            {posters.map((p: any) => {
-              const optimizedSrc = p.secure_url.replace("/upload/", "/upload/c_scale,w_800,q_auto,f_auto/");
-              return (
-                <div
-                  key={p.id}
-                  className="group relative w-[80vw] flex-shrink-0 snap-start overflow-hidden rounded-2xl border border-white/10 bg-black text-left transition hover:border-cinema-accent/60 md:w-[400px]"
-                  style={{ aspectRatio: "4 / 5" }}
-                >
-                  <Image
-                    src={optimizedSrc}
-                    alt="Poster"
-                    fill
-                    sizes="(max-width: 768px) 80vw, 400px"
-                    loading="lazy"
-                    className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 transition group-hover:opacity-100" />
-                </div>
-              );
-            })}
-          </Carousel>
-        ) : (
-          <div className="text-cinema-muted rounded-xl border border-white/10 bg-white/5 p-8 text-center">
-            <p>No posters found.</p>
-          </div>
-        )}
-      </div>
-    </section>
-  );
-}
-
-function Testimonials() {
-  return (
-    <section className="relative bg-cinema-surface-2 px-6 py-28 md:px-10">
-      <div className="mx-auto max-w-7xl">
-        <div className="reveal mb-14">
-          <p className="mb-4 text-xs uppercase tracking-[0.3em] text-cinema-accent">
-            06 — Words from clients
-          </p>
-          <h2 className="font-display text-5xl leading-none text-cinema-text md:text-7xl">
-            Kind <span className="italic text-cinema-accent">words.</span>
-          </h2>
-        </div>
-        <div className="grid gap-6 md:grid-cols-3">
-          {testimonials.map((t: any, index: number) => (
-            <figure
-              key={index}
-              className="reveal flex h-full flex-col rounded-2xl border border-white/10 bg-white/[0.03] p-8 backdrop-blur-md"
-              style={{ transitionDelay: `${index * 80}ms` }}
-            >
-              <div className="font-display text-5xl leading-none text-cinema-accent">
-                “
-              </div>
-              <blockquote className="mt-4 flex-1 text-base italic leading-relaxed text-cinema-text/90">
-                {t.quote}
-              </blockquote>
-              <figcaption className="mt-6 border-t border-white/10 pt-4 text-sm">
-                <div className="text-cinema-text">{t.author}</div>
-                <div className="text-cinema-muted">{t.role}</div>
-              </figcaption>
-            </figure>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function Contact() {
-  return (
-    <section
-      id="contact"
-      className="grain relative overflow-hidden bg-cinema-surface px-6 py-32 md:px-10"
-    >
-      <div
-        className="absolute inset-0 opacity-30 blur-3xl"
-        style={{
-          background:
-            "radial-gradient(circle at 50% 50%, rgba(236,72,153,0.25), transparent 60%)",
-        }}
-      />
-      <div className="relative mx-auto max-w-5xl text-center">
-        <p className="reveal mb-6 text-xs uppercase tracking-[0.3em] text-cinema-accent">
-          07 — Let&apos;s talk
-        </p>
-        <h2 className="reveal font-display text-6xl leading-[0.95] text-cinema-text md:text-8xl">
-          Let&apos;s create something{" "}
-          <span className="italic text-cinema-accent">cinematic.</span>
-        </h2>
-        <div className="reveal mt-12 flex flex-wrap items-center justify-center gap-4">
-          <a
-            href={`mailto:${editorData.email}`}
-            className="inline-flex items-center gap-3 rounded-full bg-cinema-accent px-8 py-4 text-sm font-medium uppercase tracking-[0.2em] text-cinema-bg transition hover:opacity-90 accent-glow"
-          >
-            ✉ Email
-          </a>
-          <a
-            href={`https://wa.me/${editorData.whatsapp}`}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-3 rounded-full border border-white/20 px-8 py-4 text-sm font-medium uppercase tracking-[0.2em] text-cinema-text transition hover:border-cinema-accent hover:text-cinema-accent"
-          >
-            ⌘ WhatsApp
-          </a>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function Footer() {
-  return (
-    <footer className="border-t border-white/10 bg-cinema-bg px-6 py-12 md:px-10">
-      <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-6 md:flex-row md:items-center">
-        <div>
-          <div className="font-display text-3xl tracking-widest text-cinema-text">
-            {editorData.name}
-            <span className="text-cinema-accent">.</span>
-          </div>
-          <p className="mt-1 text-sm text-cinema-muted">{editorData.tagline}</p>
-        </div>
-        <div className="flex flex-wrap gap-6 text-xs uppercase tracking-[0.25em] text-cinema-muted">
-          <a href={`mailto:${editorData.email}`} className="hover:text-cinema-accent">
-            Email
-          </a>
-          <a
-            href={`https://instagram.com/${editorData.instagram}`}
-            target="_blank"
-            rel="noreferrer"
-            className="hover:text-cinema-accent"
-          >
-            Instagram
-          </a>
-        </div>
-        <div className="text-xs uppercase tracking-[0.25em] text-cinema-muted">
-          © {new Date().getFullYear()} {editorData.name}
-        </div>
-      </div>
-    </footer>
+        <iframe src={src} className="absolute inset-0 w-full h-full" allowFullScreen />
+      </motion.div>
+    </motion.div>
   );
 }
 
 export default function Home() {
-  const [modal, setModal] = useState<ModalState>(null);
-  useReveal();
+  const [selectedVideo, setSelectedVideo] = useState<any>(null);
+  
+  const { data: videos = [] } = useQuery({ queryKey: ["/videos"], queryFn: async () => {
+    const res = await fetch(`${API_URL}/videos/`);
+    return res.ok ? res.json() : [];
+  }});
 
-  useEffect(() => {
-    document.documentElement.style.scrollBehavior = "smooth";
-    return () => {
-      document.documentElement.style.scrollBehavior = "";
-    };
-  }, []);
+  const { data: shorts = [] } = useQuery({ queryKey: ["/shorts"], queryFn: async () => {
+    const res = await fetch(`${API_URL}/shorts/`);
+    return res.ok ? res.json() : [];
+  }});
 
-  const goContact = () => {
-    document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
-  };
+  const { data: posters = [] } = useQuery({ queryKey: ["/posters"], queryFn: async () => {
+    const res = await fetch(`${API_URL}/posters/`);
+    return res.ok ? res.json() : [];
+  }});
 
   return (
-    <main className="min-h-screen bg-cinema-bg text-cinema-text">
-      <Nav onContact={goContact} />
-      <Hero />
-      <About />
-      <Services />
-      <VideosSection onOpen={setModal} />
-      <ShortsSection onOpen={setModal} />
-      <PostersSection />
-      <Testimonials />
-      <Contact />
-      <Footer />
-      <VideoModal state={modal} onClose={() => setModal(null)} />
+    <main className="relative bg-background">
+      <div className="noise" />
+      <Navbar />
+
+      {/* Hero Section */}
+      <section className="relative min-h-screen flex items-center justify-center pt-20 px-6 text-center">
+        <div className="glow top-0 left-1/2 -translate-x-1/2 bg-primary/20 opacity-30" />
+        
+        <div className="max-w-5xl mx-auto z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/5 bg-white/5 text-[10px] font-bold uppercase tracking-[0.2em] text-primary mb-8 animate-pulse">
+              <span className="w-2 h-2 rounded-full bg-primary animate-ping" />
+              Available for Q3 Projects
+            </div>
+            <h1 className="text-6xl md:text-[10vw] font-black leading-[0.85] tracking-tighter mb-10">
+              CRAFTING <br />
+              <span className="text-gradient italic">CINEMATIC</span> <br />
+              NARRATIVES.
+            </h1>
+            <p className="text-lg md:text-2xl text-foreground/50 max-w-2xl mx-auto mb-12 leading-relaxed font-medium">
+              High-impact video post-production for digital-first brands and creators. I turn raw footage into attention-grabbing stories.
+            </p>
+            <div className="flex flex-col md:flex-row items-center justify-center gap-6">
+              <a href="#portfolio" className="btn-primary w-full md:w-auto">Explore Portfolio</a>
+              <a href="#contact" className="flex items-center gap-3 text-sm font-bold tracking-widest uppercase hover:text-primary transition-colors">
+                Book a Strategy Call <ArrowRight className="w-4 h-4" />
+              </a>
+            </div>
+          </motion.div>
+        </div>
+
+        <motion.div 
+          animate={{ y: [0, 15, 0] }} 
+          transition={{ duration: 3, repeat: Infinity }}
+          className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-foreground/20"
+        >
+          <span className="text-[10px] font-bold uppercase tracking-[0.3em]">Scroll</span>
+          <div className="w-px h-10 bg-gradient-to-b from-primary/50 to-transparent" />
+        </motion.div>
+      </section>
+
+      {/* Trust & Stats */}
+      <section className="py-24 border-y border-white/5">
+        <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12 text-center md:text-left">
+          {profile.stats.map((stat, i) => (
+            <div key={i} className="space-y-2 border-l border-white/10 pl-8">
+              <div className="text-4xl font-black text-primary">{stat.value}</div>
+              <div className="text-xs font-bold tracking-widest uppercase text-foreground/30">{stat.label}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Portfolio Section */}
+      <section id="portfolio" className="section-padding overflow-hidden">
+        <div className="max-w-7xl mx-auto mb-20 flex flex-col md:flex-row md:items-end justify-between gap-10 px-6">
+          <div className="max-w-2xl">
+            <div className="text-xs font-bold tracking-[0.3em] uppercase text-primary mb-6">Recent Work</div>
+            <h2 className="text-5xl md:text-8xl font-black mb-8 leading-tight">THE <br />SHOWREEL.</h2>
+            <p className="text-lg text-foreground/40 leading-relaxed">A selection of premium edits focused on high retention and cinematic storytelling across all formats.</p>
+          </div>
+          <div className="flex gap-4">
+             <div className="w-20 h-20 rounded-full border border-white/10 flex items-center justify-center text-foreground/20 hover:text-primary hover:border-primary transition-all cursor-pointer">
+                <Play className="w-6 h-6 fill-current" />
+             </div>
+          </div>
+        </div>
+
+        {/* Bento Grid */}
+        <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-12 gap-8 auto-rows-[350px] md:auto-rows-[450px]">
+          {videos.slice(0, 5).map((v: any, i: number) => {
+            const span = i === 0 ? "md:col-span-8 md:row-span-1" : i === 1 ? "md:col-span-4 md:row-span-2" : "md:col-span-4";
+            return (
+              <motion.div 
+                key={v.id} 
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                whileHover={{ y: -10 }}
+                className={`${span} relative rounded-[3rem] overflow-hidden border border-white/5 cursor-pointer group glass`}
+                onClick={() => setSelectedVideo({ id: v.youtube_id, vertical: false })}
+              >
+                <Image src={thumbUrl(v.youtube_id)} alt={v.title} fill className="object-cover transition-transform duration-1000 group-hover:scale-110" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-90 group-hover:opacity-100 transition-opacity" />
+                <div className="absolute inset-0 flex flex-col justify-end p-12">
+                   <div className="text-[10px] font-bold tracking-widest uppercase text-primary mb-3">Long-Form Feature</div>
+                   <h3 className="text-3xl font-black mb-4 leading-tight">{v.title}</h3>
+                   <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-all translate-y-4 group-hover:translate-y-0">
+                     Play Case Study <ArrowUpRight className="w-4 h-4" />
+                   </div>
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Vertical Shorts */}
+      <section className="section-padding bg-[#050508]">
+        <div className="max-w-7xl mx-auto px-6 mb-16 text-center">
+          <div className="text-xs font-bold tracking-[0.3em] uppercase text-primary mb-6">Social Growth</div>
+          <h2 className="text-5xl md:text-7xl font-black">VERTICAL MASTERY</h2>
+        </div>
+        
+        <div className="flex gap-8 overflow-x-auto no-scrollbar pb-16 px-12 -mx-12">
+          {shorts.map((s: any, i: number) => (
+            <motion.div 
+              key={s.id}
+              initial={{ opacity: 0, x: 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.1 }}
+              className="min-w-[320px] h-[580px] relative rounded-[3rem] overflow-hidden border border-white/10 group cursor-pointer glass"
+              onClick={() => setSelectedVideo({ id: s.youtube_id, vertical: true })}
+            >
+              <Image src={thumbUrl(s.youtube_id)} alt={s.title} fill className="object-cover transition-transform duration-700 group-hover:scale-105" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-95" />
+              <div className="absolute bottom-10 left-10 right-10">
+                <h4 className="text-xl font-bold mb-3">{s.title}</h4>
+                <div className="flex items-center gap-2 text-primary font-bold text-xs uppercase tracking-widest">
+                  <Play className="w-4 h-4 fill-current" /> Watch Short
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* Services & Workflow */}
+      <section id="services" className="section-padding">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="grid lg:grid-cols-2 gap-24 items-start">
+            <div>
+              <div className="text-xs font-bold tracking-[0.3em] uppercase text-primary mb-6">Expertise</div>
+              <h2 className="text-5xl md:text-7xl font-black mb-12 leading-tight">HOW I <br />HELP YOU <br /><span className="text-gradient">GROW.</span></h2>
+              <div className="space-y-8">
+                {profile.services.map((s, i) => (
+                  <div key={i} className="flex gap-8 p-10 rounded-[2.5rem] glass glass-hover">
+                    <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center text-primary flex-shrink-0">
+                      {s.icon}
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-bold mb-3">{s.title}</h3>
+                      <p className="text-foreground/40 leading-relaxed">{s.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <div className="text-xs font-bold tracking-[0.3em] uppercase text-primary mb-6">Workflow</div>
+              <h2 className="text-5xl font-black mb-12">THE PROCESS.</h2>
+              <div className="space-y-12">
+                {profile.workflow.map((w, i) => (
+                  <div key={i} className="relative pl-16">
+                    <div className="absolute left-0 top-0 text-4xl font-black text-white/5">{w.step}</div>
+                    <h3 className="text-xl font-bold mb-3 flex items-center gap-3">
+                      <div className="w-2 h-2 rounded-full bg-primary" />
+                      {w.title}
+                    </h3>
+                    <p className="text-foreground/40 leading-relaxed">{w.desc}</p>
+                  </div>
+                ))}
+              </div>
+              
+              <div className="mt-20 p-12 rounded-[3rem] bg-gradient-to-br from-primary/10 to-indigo-500/10 border border-primary/5">
+                <div className="flex items-center gap-4 mb-6 text-primary">
+                   <Award className="w-8 h-8" />
+                   <div className="text-xl font-bold">Premium Quality Guaranteed</div>
+                </div>
+                <p className="text-sm text-foreground/50 leading-relaxed mb-8">Every edit undergoes a rigorous multi-pass review focusing on pacing, clarity, and emotional resonance.</p>
+                <a href="#contact" className="btn-primary w-full inline-block text-center">Start Your Journey</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section id="faq" className="section-padding bg-[#050508]">
+        <div className="max-w-4xl mx-auto px-6">
+          <div className="text-center mb-20">
+            <h2 className="text-5xl font-black mb-6">F.A.Q</h2>
+            <p className="text-foreground/40 uppercase text-xs font-bold tracking-widest">Common questions about working together</p>
+          </div>
+          <div className="space-y-6">
+            {profile.faq.map((item, i) => (
+              <div key={i} className="p-10 rounded-[2.5rem] glass border-white/5">
+                <h3 className="text-xl font-bold mb-4 flex items-center gap-4">
+                  <MessageCircle className="w-5 h-5 text-primary" />
+                  {item.q}
+                </h3>
+                <p className="text-foreground/40 leading-relaxed pl-9">{item.a}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Contact Section */}
+      <section id="contact" className="section-padding">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="relative rounded-[4rem] overflow-hidden bg-white/[0.02] border border-white/10 p-12 md:p-24">
+            <div className="absolute top-0 right-0 w-1/2 h-full bg-primary/10 blur-[150px] -z-10" />
+            <div className="grid lg:grid-cols-2 gap-24 items-center">
+              <div>
+                <h2 className="text-5xl md:text-8xl font-black mb-10 leading-tight">READY TO <br /><span className="text-gradient">SCALE?</span></h2>
+                <p className="text-xl text-foreground/40 mb-12 max-w-md">Let's create something that stands the test of time. Reach out today for a custom quote.</p>
+                
+                <div className="space-y-8">
+                  <div className="flex items-center gap-6 group cursor-pointer">
+                    <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
+                      <Mail className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <div className="text-[10px] font-bold uppercase tracking-widest text-foreground/30">Email Us</div>
+                      <div className="text-xl font-bold">mahnoorfatim09@gmail.com</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-6 group cursor-pointer">
+                    <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
+                      <Smartphone className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <div className="text-[10px] font-bold uppercase tracking-widest text-foreground/30">WhatsApp Direct</div>
+                      <div className="text-xl font-bold">+92 329 7765694</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <form className="space-y-6">
+                <div className="grid md:grid-cols-2 gap-6">
+                  <input type="text" placeholder="Name" className="w-full p-6 rounded-3xl bg-white/5 border border-white/10 outline-none focus:border-primary transition-all" />
+                  <input type="email" placeholder="Email" className="w-full p-6 rounded-3xl bg-white/5 border border-white/10 outline-none focus:border-primary transition-all" />
+                </div>
+                <select className="w-full p-6 rounded-3xl bg-white/5 border border-white/10 outline-none focus:border-primary transition-all text-foreground/40">
+                  <option>Select Service</option>
+                  <option>Short-Form Package</option>
+                  <option>Long-Form Production</option>
+                  <option>Full Channel Management</option>
+                </select>
+                <textarea rows={5} placeholder="Project Details" className="w-full p-6 rounded-3xl bg-white/5 border border-white/10 outline-none focus:border-primary transition-all resize-none" />
+                <button className="w-full btn-primary py-6">Send Message</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <footer className="py-20 border-t border-white/5">
+        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-10">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center font-black">M</div>
+            <span className="text-xl font-bold tracking-tighter uppercase">Mahnoor Fatima</span>
+          </div>
+          <div className="flex gap-10">
+            {['Instagram', 'LinkedIn', 'Behance'].map(s => (
+              <a key={s} href="#" className="text-[10px] font-bold uppercase tracking-[0.3em] text-foreground/30 hover:text-primary transition-colors">{s}</a>
+            ))}
+          </div>
+          <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-foreground/20">&copy; 2026 Visual Edge Media.</div>
+        </div>
+      </footer>
+
+      <AnimatePresence>
+        {selectedVideo && <VideoModal video={selectedVideo} onClose={() => setSelectedVideo(null)} />}
+      </AnimatePresence>
     </main>
   );
 }
